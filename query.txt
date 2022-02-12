@@ -1,0 +1,182 @@
+create database class; 
+
+use class;
+
+CREATE TABLE mentor (
+    mentorId INT AUTO_INCREMENT PRIMARY KEY,
+    mentorName VARCHAR(255),
+    technology VARCHAR(255)
+);
+
+insert into mentor(mentorName,technology) values ('John','Web Development'),
+('Hari','Database'),('Rohan','Blockchain'),('Arvind','Analytics'),('Sumit','ML');
+SELECT * FROM mentor;
+
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255),
+    gender VARCHAR(15),
+    mobile VARCHAR(10) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mentor INT,
+    CONSTRAINT FOREIGN KEY (mentor)
+        REFERENCES mentor (mentorId)
+);
+
+insert into users(firstName,lastName,gender,mobile,email,mentor) 
+values ('Sri','Charan','Male',2366666666,'scharan@mail.com',3),
+('Lasya','J','Female',2645566666,'jlasya@example.com',2),
+('Guna','Jayram','Male',3232644484,'gunajy@gmail.com',2),
+('Priya','Singh','Female',1256456656,'psingh@ymail.com',5),
+('Jay','SS','Male',6697889622,'ssjay@example.com',2);
+select * from users;
+
+CREATE TABLE topics (
+    id INT NOT NULL AUTO_INCREMENT,
+    category VARCHAR(255) UNIQUE,
+    topic VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+insert into topics(category,topic) 
+values ('Backend','mysql'),
+('Language','Javascript'),
+('Backend1','mongodb'),
+('Cloud','AWS'),
+('Frontend','React');
+
+select * from topics;
+
+CREATE TABLE codekata (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    question_id INT,
+    topicId INT,
+    userID INT,
+    CONSTRAINT FOREIGN KEY (userID)
+        REFERENCES users (id),
+    CONSTRAINT FOREIGN KEY (topicId)
+        REFERENCES topics (id)
+);
+
+insert into codekata(question_id,topicId,userID)
+values (101,6,7),
+(102,6,8),
+(103,8,9),
+(104,9,10),
+(105,7,6);
+
+select * from codekata;
+
+CREATE TABLE attendance (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    attDate DATE NOT NULL,
+    userID INT,
+    FOREIGN KEY (userID)
+        REFERENCES users (id)
+);
+
+insert into attendance(attDate,userID)
+values ('2021-01-31',6),
+('2021-02-01',9),
+('2022-01-01',8),
+('2021-06-28',7),
+('2021-06-29',7);
+
+select * from attendance;
+
+
+CREATE TABLE tasks (
+    taskID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    taskCateg INT,
+    task VARCHAR(255),
+    FOREIGN KEY (taskCateg)
+        REFERENCES topics (id)
+);
+
+insert into tasks (taskCateg,task)
+values (7,'Find the maximum number'),
+(9,'Configure a EC2 instance'),
+(10,'Handle routes'),
+(6,'Create a database with sample data'),
+(8,'Handson');
+
+select * from tasks;
+
+CREATE TABLE company_drives (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT,
+    company_name VARCHAR(255),
+    studentID INT,
+    CONSTRAINT FOREIGN KEY (studentID)
+        REFERENCES users (id)
+);
+
+
+insert into company_drives (company_id,company_name,studentID)
+values (2222,'MM Capitals',7),
+(2222,'LOO Fintech',9),
+(6629,'MMM and Co',6),
+(7075,'New Technologies',7),
+(4566,'QQQ Bank',10),
+(7075,'New Technologies',6),
+(7075,'New Technologies',9),
+(2222,'MM Capitals',6);
+
+select * from company_drives;
+
+CREATE TABLE students_activated_courses (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    studentID INT,
+    courseID INT NOT NULL,
+    courseName VARCHAR(255),
+    CONSTRAINT FOREIGN KEY (studentID)
+        REFERENCES users (id)
+);
+
+insert into students_activated_courses 
+values (200,7,1500,'Python'),
+(201,8,1503,'AWS essentails'),
+(202,9,1504,'IT Fundamentals'),
+(203,6,1505,'Database concepts'),
+(204,7,1507,'Ruby');
+
+select * from students_activated_courses;
+
+CREATE TABLE courses (
+    courseID INT AUTO_INCREMENT PRIMARY KEY,
+    courseName VARCHAR(255),
+    topicID INT,
+    CONSTRAINT FOREIGN KEY (topicID)
+        REFERENCES topics (id)
+);
+
+insert into courses(courseName,topicID) values
+('Web development',7),
+('c#',6),
+('Python',7),
+('Javascript',10),
+('Wordpress',8);
+
+select * from courses;
+
+-- get number problems solved in codekata by combining the users
+select count(*) from codekata;
+
+-- display the no of company drives attended by a user
+SELECT 
+    CONCAT(A.firstName, ' ', A.lastName) AS Name,
+    COUNT(*) AS No_Companies
+FROM users A
+	LEFT JOIN company_drives B ON A.id = B.studentID
+	GROUP BY Name;
+    
+-- list all the mentors
+select * from mentor;
+
+-- list the number of students that are assigned for a mentor
+SELECT 
+    mentorName AS Name, COUNT(*) AS Num_students
+FROM mentor A
+        INNER JOIN users B ON A.mentorId = B.mentor
+GROUP BY Name;
